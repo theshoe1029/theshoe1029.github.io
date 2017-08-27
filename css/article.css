@@ -1,0 +1,41 @@
+/*****************************
+**ARTICLES                  **
+*****************************/
+
+html{
+  	margin: 4% 7% 0 7%;
+}
+
+body{
+	font-family: 'Roboto', sans-serif;
+	color: #000000;
+}
+
+h1{
+	font-size: 0.85em;
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
+}
+
+p{
+	font-family: 'Roboto', sans-serif;
+	font-size: 0.65em;
+}
+
+a{
+	text-decoration: none;
+	color: #686bff;
+}
+
+img{
+	display:inline-block;
+	padding-right: 7%;
+	margin: 0 auto;
+	float: right;
+	max-width: 100%;
+	height: auto;
+}
+
+iframe{
+	overflow: hidden;
+}
