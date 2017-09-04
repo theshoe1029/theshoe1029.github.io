@@ -5,69 +5,9 @@
 </header>
 <body>
     <h1>Python Sweep Visualizer - 6/10/2017</h1>
-            <p>For this program I was trying to duplicate the visualization code for the <a href="http://scanse.io">scanse sweep sensor</a>. The scanse website has a free visualization program that displays all of the objects the sensor detects as points on a screen. In order to better understand the sensor, I set out to clone this program using the sensor's python library. This program uses the pygame library to display all the points the sensor sees on a raspberry pi monitor. It uses several arrays to take readings from the sensor and then store those readings to be drawn on the screen. The code for the completed program is attached below. To the right of the code is a comparison of the visualizer program that is written by the manufacturer, and the one that I wrote.</p>
-            <div id="examples">
-                <!-- HTML generated using hilite.me -->
-                <div style="background: #ffffff; overflow:auto;width:50%;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;font-size:0.5em;display:inline-block;margin:0 auto;"><pre style="margin: 0; line-height: 125%"><span style="color: #008800; font-weight: bold">import</span> <span style="color: #0e84b5; font-weight: bold">serial</span><span style="color: #333333">,</span> <span style="color: #0e84b5; font-weight: bold">struct</span><span style="color: #333333">,</span> <span style="color: #0e84b5; font-weight: bold">os</span><span style="color: #333333">,</span> <span style="color: #0e84b5; font-weight: bold">math</span><span style="color: #333333">,</span> <span style="color: #0e84b5; font-weight: bold">pygame</span><span style="color: #333333">,</span> <span style="color: #0e84b5; font-weight: bold">time</span>
-<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">sweeppy</span> <span style="color: #008800; font-weight: bold">import</span> Sweep
-<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">sweeppy</span> <span style="color: #008800; font-weight: bold">import</span> Scan
-<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">sweeppy</span> <span style="color: #008800; font-weight: bold">import</span> Sample
-<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">array</span> <span style="color: #008800; font-weight: bold">import</span> array
-<span style="color: #008800; font-weight: bold">from</span> <span style="color: #0e84b5; font-weight: bold">pygame.locals</span> <span style="color: #008800; font-weight: bold">import</span> <span style="color: #333333">*</span>
-
-pygame<span style="color: #333333">.</span>init()
-
-<span style="color: #888888">#This sets up the colors and size of the pygame window</span>
-WHITE <span style="color: #333333">=</span> (<span style="color: #0000DD; font-weight: bold">255</span>,<span style="color: #0000DD; font-weight: bold">255</span>,<span style="color: #0000DD; font-weight: bold">255</span>)
-BLACK <span style="color: #333333">=</span> (<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>,<span style="color: #0000DD; font-weight: bold">0</span>)
-width <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">800</span>
-height <span style="color: #333333">=</span> <span style="color: #0000DD; font-weight: bold">600</span>
-
-<span style="color: #888888">#This creates the pygame window and sets its background</span>
-screen <span style="color: #333333">=</span> pygame<span style="color: #333333">.</span>display<span style="color: #333333">.</span>set_mode((width,height))
-screen<span style="color: #333333">.</span>fill(WHITE)
-pygame<span style="color: #333333">.</span>display<span style="color: #333333">.</span>update()
-pygame<span style="color: #333333">.</span>display<span style="color: #333333">.</span>set_caption(<span style="background-color: #fff0f0">&#39;Sweep Visualizer&#39;</span>)
-
-<span style="color: #888888">#Initialize the sweep sensor</span>
-<span style="color: #008800; font-weight: bold">with</span> Sweep(<span style="background-color: #fff0f0">&#39;/dev/ttyUSB0&#39;</span>) <span style="color: #008800; font-weight: bold">as</span> sweep:
-
-    <span style="color: #888888">#Set the sweep motor speeds and start scanning</span>
-    sweep<span style="color: #333333">.</span>set_motor_speed(<span style="color: #0000DD; font-weight: bold">5</span>)
-    sweep<span style="color: #333333">.</span>set_sample_rate(<span style="color: #0000DD; font-weight: bold">2</span>)
-    sweep<span style="color: #333333">.</span>start_scanning()
-    
-    <span style="color: #008800; font-weight: bold">while</span> <span style="color: #007020">True</span>:
-        <span style="color: #888888">#Refresh the screen after each scan</span>
-        screen<span style="color: #333333">.</span>fill(WHITE)
-        <span style="color: #008800; font-weight: bold">for</span> scan <span style="color: #000000; font-weight: bold">in</span> sweep<span style="color: #333333">.</span>get_scans():
-            <span style="color: #888888">#Store samples in scan array</span>
-            scans <span style="color: #333333">=</span> scan<span style="color: #333333">.</span>samples[:]
-            
-            <span style="color: #888888">#Loop for each sample</span>
-            <span style="color: #008800; font-weight: bold">for</span> i <span style="color: #000000; font-weight: bold">in</span> <span style="color: #007020">range</span>(<span style="color: #007020">len</span>(scans)):
-                <span style="color: #888888">#Store direction property of each sample in angles array</span>
-                angles <span style="color: #333333">=</span> <span style="color: #007020">str</span>(scans[i][<span style="color: #0000DD; font-weight: bold">0</span>])
-                <span style="color: #888888">#Remove last three digits of angle</span>
-                <span style="color: #008800; font-weight: bold">if</span>(<span style="color: #007020">len</span>(angles[:]) <span style="color: #333333">==</span> <span style="color: #0000DD; font-weight: bold">6</span>):
-                    angleArray <span style="color: #333333">=</span> <span style="color: #007020">int</span>(angles[:<span style="color: #0000DD; font-weight: bold">3</span>])
-                <span style="color: #008800; font-weight: bold">else</span>: 
-                    angleArray <span style="color: #333333">=</span> <span style="color: #007020">int</span>(angles[:<span style="color: #0000DD; font-weight: bold">2</span>])
-                <span style="color: #888888">#Calculate x and y components of each sample based on basic trig</span>
-                <span style="color: #008800; font-weight: bold">if</span> scans[i][<span style="color: #0000DD; font-weight: bold">2</span>] <span style="color: #333333">&gt;</span> <span style="color: #0000DD; font-weight: bold">100</span>:
-                    x <span style="color: #333333">=</span> <span style="color: #007020">int</span>(<span style="color: #6600EE; font-weight: bold">0.75</span> <span style="color: #333333">*</span> (scans[i][<span style="color: #0000DD; font-weight: bold">1</span>] <span style="color: #333333">*</span> math<span style="color: #333333">.</span>cos(angleArray <span style="color: #333333">*</span> math<span style="color: #333333">.</span>pi <span style="color: #333333">/</span> <span style="color: #0000DD; font-weight: bold">180</span>)))
-                    y <span style="color: #333333">=</span> <span style="color: #007020">int</span>(<span style="color: #6600EE; font-weight: bold">0.75</span> <span style="color: #333333">*</span> (scans[i][<span style="color: #0000DD; font-weight: bold">1</span>] <span style="color: #333333">*</span> math<span style="color: #333333">.</span>sin(angleArray <span style="color: #333333">*</span> math<span style="color: #333333">.</span>pi <span style="color: #333333">/</span> <span style="color: #0000DD; font-weight: bold">180</span>)))
-                
-                    <span style="color: #888888">#Draw circle on screen based on x and y components</span>
-                    pygame<span style="color: #333333">.</span>draw<span style="color: #333333">.</span>circle(screen, BLACK, [x <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">400</span>,y <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">300</span>], <span style="color: #0000DD; font-weight: bold">2</span>)
-                <span style="color: #008800; font-weight: bold">else</span>:
-                    pygame<span style="color: #333333">.</span>draw<span style="color: #333333">.</span>circle(screen, WHITE, [x <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">400</span>,y <span style="color: #333333">+</span> <span style="color: #0000DD; font-weight: bold">300</span>], <span style="color: #0000DD; font-weight: bold">2</span>)
-            
-            <span style="color: #888888">#Update screen with all the points from the sample</span>
-            pygame<span style="color: #333333">.</span>display<span style="color: #333333">.</span>update()
-            screen<span style="color: #333333">.</span>fill(WHITE)
-            </pre></div>
-                <img src="assets/comparison.png" alt="">
+            <p>For this program I was trying to duplicate the visualization code for the <a href="http://scanse.io">scanse sweep sensor</a>. The scanse website has a free visualization program that displays all of the objects the sensor detects as points on a screen. In order to better understand the sensor, I set out to clone this program using the sensor's python library. My program uses the pygame library to display all the points the sensor sees on a raspberry pi monitor. It uses several arrays to take readings from the sensor and then store those readings to be drawn on the screen. Below is a comparison of the visualizer program that is written by the manufacturer, and the visualizer that I wrote.  The python visualizer is on the left, and the visualizer written by the manufacturer is on the right.  You can look at the program on my github at the link <a href="https://github.com/theshoe1029/Power-Wheels-Team/blob/86703ed78bdb096a5fb02323ce03b14120ba3899/Python/SweepVisualizer.py">here</a>.</p>
+            <div id="youtube">
+            <img src="assets/bettervisualizer.png" alt="" class="visualizer"><img src="assets/top.png" alt="" class="python">
             </div>
     </body>
 </html>

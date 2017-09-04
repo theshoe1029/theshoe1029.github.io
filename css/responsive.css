@@ -1,4 +1,4 @@
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 800px) {
 
 /*****************************
 **HEADER                    **
@@ -74,14 +74,6 @@
     margin: 0;
     text-align: center;
   }
-  article h1{
-    font-size: 0.65em;
-    text-align: center;
-  }
-
-  article p{
-    font-size: 0.5em;
-  }
 
 /*****************************
 **BIO                       **
@@ -93,6 +85,7 @@
 
   .portrait{
     display: none;
+    border-radius: 5px;
   }
 
   #bio{
@@ -202,6 +195,7 @@
   #work-experience{
     margin-bottom: 50px;
     display: block;
+    font-size: 0.75em;
   }
 
   #work-experience img{
@@ -209,16 +203,16 @@
     height: 50px;
   }
 
-  #BrainSTEM, #Polygon{
+  #BrainSTEM, #Polygon, #leap{
     display: inline;
     text-align: center;
     float: none;
     position: static;
   }
 
-  #Giant-Eagle, #Lowes
-  {
-    display: none;
+  #Polygon img{
+    width: 75%;
+    height: auto;
   }
 
 /*****************************

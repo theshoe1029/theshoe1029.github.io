@@ -91,6 +91,7 @@ body{
 	background-color: #FFFFFF;
 	font-size: 24px;
   margin: 0;
+  --side-margin: 15%;
 }
 
 /*****************************
@@ -135,11 +136,17 @@ footer p{
 	margin: 1.5% 0 3% 7%;
 }
 
+article{
+  margin: 0% var(--side-margin) 0 var(--side-margin);
+  padding: 0;
+  overflow: hidden;
+}
+
 iframe{
+  overflow: hidden;
   border: none;
   width: 100%;
   height: 100%;
-  overflow: hidden;
 }
 
 /*****************************
@@ -147,7 +154,7 @@ iframe{
 *****************************/
 
 #about{
-	margin: 4% 7% 0 7%;
+	margin: 4% var(--side-margin) 0 var(--side-margin);
 	width: auto;
   display: inline-block;
 }
@@ -174,6 +181,19 @@ iframe{
 	text-decoration: none;
 	color: #686bff;
 }
+
+.download-top{
+  width: 35px;
+  height: 35px;
+  display: inline-block;
+}
+
+#download p{
+  display: inline-block;
+  color: black;
+  text-decoration: none;
+}
+
 
 /*****************************
 **CONTACT                   **
@@ -219,12 +239,16 @@ h4{
 	background-image: url('../assets/greymail.png');
 }
 
+.contact-info li.download-resume a{
+    background-image: url('../assets/download.png');
+}
+
 /*****************************
 **ACADEMICS                 **
 *****************************/
 
 #test-scores{
-    margin: 4% 7% 0 7%;
+    margin: 4% var(--side-margin) 0 var(--side-margin);
 }
 
 h6{
@@ -283,7 +307,7 @@ h6{
 #awards{
   font-size: 0.75em;
   text-align: center;
-  margin: 3% 7% 0 7%;
+  margin: 3% var(--side-margin) 0 var(--side-margin);
   padding: 0;
 }
 
@@ -294,23 +318,28 @@ h6{
 h5{
   font-size: 0.75em;
   font-family: 'Roboto', sans-serif;
-  margin: 5% 4% 0 7%;
+  margin: 5% var(--side-margin) 0 var(--side-margin);
+}
+
+#proficiencies{
+  height: auto;
+  width: 100%;
+  display: inline-block;
 }
 
 #proficiencies-left{
   font-size: 0.65em;
+  margin: 0 0 0 var(--side-margin);
   font-family: 'Roboto', sans-serif;
-  margin: 0 0 0 7%;
-  width: 40%;
-  display: inline-block;
+  width: 30%;
+  float: left;
 }
 
 #proficiencies-right{
   font-size: 0.65em;
+  margin: 0 var(--side-margin) 0 0;
   font-family: 'Roboto', sans-serif;
-  margin: 0 7% 0 0;
-  width: 40%;
-  display: inline-block;
+  width: 30%;
   float: right;
 }
 
@@ -350,7 +379,7 @@ h3{
 }
 
 #work-experience{
-  margin: 5% 7% 0 7%;
+  margin: 5% var(--side-margin) 0 var(--side-margin);
   padding: 0;
 }
 
