@@ -1,0 +1,327 @@
+@media only screen and (max-width: 800px) {
+
+/*****************************
+**HEADER                    **
+*****************************/
+
+  #top, #bottom, #left, #right { display: none; }
+
+  html{
+    font-size: 24px;
+  }
+
+  #title{
+    text-align: center;
+  }
+
+  #head{
+    font-size: 24px;
+    text-align: center;
+    margin: 2.5% 0 0 0;
+  }
+
+  header hr{
+    width: 2px;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    position: absolute;
+    top: 4px;
+    background: #606060;
+    display: inline-block;
+  }
+
+  #head h1{
+    padding: 0;
+    margin: 0 5px 0 0;
+  }
+
+  #head h2{
+    padding: 0;
+    margin: 0 0 0 5px;
+  }
+
+  #bio p{
+    margin-bottom: 5%;
+  }
+  
+  h1, h2{
+    font-size: 0.7em;
+  }
+
+  nav{
+    font-size: 0.7em;
+    text-align: center;
+    float: none;
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav ul{
+    padding: 0;
+    margin: 0;
+  }
+
+  nav li{
+    width: 100px;
+    margin-right: 5%;
+  }
+  
+  nav a{
+    width: 100px;
+    margin: 0;
+    text-align: center;
+  }
+
+/*****************************
+**BIO                       **
+*****************************/
+
+  main p{
+    display: inline-block;
+  }
+
+  .portrait{
+    display: none;
+    border-radius: 5px;
+  }
+
+  #bio{
+    display: block;
+    vertical-align: bottom;
+    font-size: 0.65em;
+  }
+
+  #primary{
+    vertical-align: top;
+    font-size: 0.7em;
+    width: auto;
+    margin: 3% 7% 3% 7%;
+  }
+
+  #about{
+    text-align: center;
+  }
+
+  #bio{
+    display: table-cell;
+  }
+
+/*****************************
+**CONTACT                   **
+*****************************/
+
+  h4{
+    text-align: center;
+    display: inline;
+    margin: 5% 0 5% 0;
+    padding: 0;
+    font-size: 0.75em;
+  }
+
+  #contact{
+    float: none;
+    position: relative;
+  }
+
+  .contact-info{
+    text-align: center;
+    display: inline;
+    margin: 0;
+    padding: 0;
+  }
+
+  ul{
+    display: inline;
+    padding: 0;
+    margin: 4% 0 0 0;
+  }
+
+/*****************************
+**ACCOMPLISHMENTS           **
+*****************************/
+
+  #test-scores{
+    text-align: center;
+    float: none;
+    position: relative;
+    display: block;
+    margin: 4% 7% 4% 7%;
+  }
+
+  #psat{
+    left: 0;
+  }
+
+  #sat, #psat, #gpa{
+    display: block;
+    position: relative;
+    float: none;
+    margin: 0;
+    margin: 0 7% 3% 7%;
+  }
+
+  #description{
+    padding: 0;
+  }
+
+  #header{
+    font-size: 2.75em;
+  }
+
+  #awards p{
+    display: block;
+    margin: 0 7% 0 7%;
+    text-align: center;
+    position: relative;
+    float: none;
+  }
+
+  h5{
+    text-align: center;
+  }
+
+/*****************************
+**WORK EXPERIENCE           **
+*****************************/
+
+  h3{
+    text-align: center;
+    margin: 5% 0 5% 0;
+  }
+
+  #work-experience{
+    margin-bottom: 50px;
+    display: block;
+    font-size: 0.75em;
+  }
+
+  #work-experience img{
+    width: auto;
+    height: 50px;
+  }
+
+  #BrainSTEM, #Polygon, #leap{
+    display: inline;
+    text-align: center;
+    float: none;
+    position: static;
+  }
+
+  #Polygon img{
+    width: 75%;
+    height: auto;
+  }
+
+/*****************************
+**FOOTER                    **
+*****************************/
+  footer{
+    margin: 0 0 35px 0;
+  }
+
+  .github{
+    position: absolute;
+    margin: 1% 17% 2% 0;
+    width: 30px;
+    height: auto;
+    right: 0; 
+  }
+
+  .youtube{
+    position: absolute;
+    margin: 1% 7% 2% 0;
+    width: 30px;
+    height: auto;
+    right: 0; 
+  }
+
+  .download{
+    position: absolute;
+    margin: 1% 27% 2% 0;
+    width: 30px;
+    height: auto;
+    right: 0; 
+  }
+
+  footer p{
+    margin-top: 11.25px;
+  }
+}
+
+/*@media only screen and (max-width: 800px) {
+
+  #top, #bottom, #left, #right { display: none; }
+
+  #title{
+    font-size: 1.25em;
+  }
+
+  #head{
+    display:;
+  }
+
+  nav{
+    display: inline-block;
+    margin: 0 7% 0 0;
+    text-align: left;
+  }
+
+  nav ul{
+    padding: 0;
+    margin: 0;
+  }
+
+  nav li{
+    width: 100px;
+    margin-right: 5%;
+  }
+  
+  nav a{
+    width: 100px;
+  }
+
+  #Giant-Eagle, #Lowes
+  {
+    display: none;
+  }
+
+  #Polygon{
+    display: block;
+    position: relative;
+    float: none;
+  }
+/*****************************
+**FOOTER                    **
+*****************************/
+
+  /*.github{
+    position: absolute;
+    margin: 1% 12% 2% 0;
+    width: 30px;
+    height: auto;
+    right: 0; 
+  }
+
+  .youtube{
+    position: absolute;
+    margin: 1% 7% 2% 0;
+    width: 30px;
+    height: auto;
+    right: 0; 
+  }
+
+  .download{
+    position: absolute;
+    margin: 1% 17% 2% 0;
+    width: 30px;
+    height: auto;
+    right: 0; 
+  }
+
+  footer p{
+    margin-top: 11.25px;
+  }
+}*/
