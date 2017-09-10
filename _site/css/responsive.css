@@ -51,7 +51,7 @@
   }
 
   nav{
-    font-size: 0.7em;
+    font-size: 0.95em;
     text-align: center;
     float: none;
     position: relative;
@@ -66,14 +66,55 @@
 
   nav li{
     width: 100px;
-    margin-right: 5%;
+    margin-top: 5%;
   }
   
   nav a{
     width: 100px;
     margin: 0;
     text-align: center;
+    display: block;
   }
+
+/*****************************
+**BLOG                      **
+*****************************/
+
+.home{
+  margin: 2.5% 15% 0 15%;
+}
+
+.home h1{
+  font-weight: normal;
+  font-size: 0.65em;
+  margin-bottom: 0;
+}
+
+.post{
+  margin: 2.5% 15% 0 15%;
+}
+
+.post-header{
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+.post-meta{
+  font-size: 0.5em;
+  color: #828282;
+  margin: 1% 0 0 0;
+  display: block;
+}
+
+.home h2{
+  font-size: 1em;
+  margin-top: 1%;
+  margin-bottom: 3%;
+}
+
+.post-content{
+  font-size: 0.7em;
+}
 
 /*****************************
 **BIO                       **
