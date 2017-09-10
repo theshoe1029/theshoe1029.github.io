@@ -37,37 +37,59 @@ header h2{
   display: inline-block;
 }
 
+/*****************************
+**BLOG                      **
+*****************************/
+
 .home{
-    margin: 5% var(--side-margin) 0 var(--side-margin);
+  margin: 2.5% var(--blog-side-margin) 0 var(--blog-side-margin);
 }
 
 .home h1{
   font-weight: normal;
   font-size: 0.85em;
-  margin-right: var(--side-margin);
-  margin-left: var(--side-margin);
+  margin-bottom: 0;
 }
 
 .post-meta{
-  font-size: 0.75em;
+  font-size: 0.7em;
   color: #828282;
+  margin: 1% 0 0 0;
 }
 
 .home h2{
-  margin: 0 var(--side-margin) 0 var(--side-margin);
+  font-size: 1.25em;
+  margin-top: 1%;
+  margin-bottom: 3%;
 }
 
 .home a{
   text-decoration: none;
   font-weight: normal;
   color: #686bff;
-  font-size: 0.85em;
 }
 
 .home ul{
   list-style: none;
   padding: 0;
-  margin-top: 0.75em;
+}
+
+.post{
+  margin: 2.5% var(--blog-side-margin) 0 var(--blog-side-margin);
+}
+
+.post-title{
+  margin: 0;
+}
+
+.post-content{
+  font-size: 0.75em;
+}
+
+.post-content a{
+  text-decoration: none;
+  font-weight: normal;
+  color: #686bff;
 }
 
 /*****************************
@@ -88,9 +110,9 @@ nav ul{
 }
 
 nav li{
+	display: inline-block;
 	margin: 0;
   padding: 0;
-  display: inline-block;
 }
 
 nav a{
@@ -99,8 +121,8 @@ nav a{
 	font-size: 0.65em;
 	list-style: none;
 	text-decoration: none;
-	margin: 0;
-  padding-right: 35%;
+	margin: 0 0 0 40px;
+  display: inline-block;
 }
 
 nav a:hover{
@@ -125,6 +147,7 @@ body{
 	font-size: 24px;
   margin: 0;
   --side-margin: 15%;
+  --blog-side-margin: 30%;
 }
 
 /*****************************
@@ -174,38 +197,6 @@ article{
   padding: 0;
   overflow: hidden;
 }
-
-iframe{
-  overflow: hidden;
-  border: none;
-  width: 100%;
-  height: 100%;
-}
-
-/*****************************
-**POSTS                     **
-*****************************/
-
-.post-title{
-  margin: 5% var(--side-margin) 0 var(--side-margin);
-  font-size: 1.5em;
-  font-weight: normal;
-}
-
-.post-meta{
-  margin: 2% var(--side-margin) 0 var(--side-margin);
-}
-
-.post-content{
-    margin: 2% var(--side-margin) 0 var(--side-margin);
-    font-size: 0.75em;
-}
-
-.post-content a{
-  text-decoration: none;
-  color: #686bff;
-}
-
 
 /*****************************
 **ABOUT                     **

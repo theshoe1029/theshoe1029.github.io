@@ -38,11 +38,66 @@ header h2{
 }
 
 /*****************************
+**BLOG                      **
+*****************************/
+
+.home{
+  margin: 2.5% var(--blog-side-margin) 0 var(--blog-side-margin);
+}
+
+.home h1{
+  font-weight: normal;
+  font-size: 0.85em;
+  margin-bottom: 0;
+}
+
+.post-meta{
+  font-size: 0.7em;
+  color: #828282;
+  margin: 1% 0 0 0;
+}
+
+.home h2{
+  font-size: 1.25em;
+  margin-top: 1%;
+  margin-bottom: 3%;
+}
+
+.home a{
+  text-decoration: none;
+  font-weight: normal;
+  color: #686bff;
+}
+
+.home ul{
+  list-style: none;
+  padding: 0;
+}
+
+.post{
+  margin: 2.5% var(--blog-side-margin) 0 var(--blog-side-margin);
+}
+
+.post-title{
+  margin: 0;
+}
+
+.post-content{
+  font-size: 0.75em;
+}
+
+.post-content a{
+  text-decoration: none;
+  font-weight: normal;
+  color: #686bff;
+}
+
+/*****************************
 **NAV                       **
 *****************************/
 
 nav{
-	margin: 13px 7% 0 0;
+	margin: 0 7% 0 0;
   padding: 0;
   display: inline-block;
   float: right;
@@ -66,7 +121,7 @@ nav a{
 	font-size: 0.65em;
 	list-style: none;
 	text-decoration: none;
-	margin: 0 0 0 75px;
+	margin: 0 0 0 40px;
   display: inline-block;
 }
 
@@ -92,6 +147,7 @@ body{
 	font-size: 24px;
   margin: 0;
   --side-margin: 15%;
+  --blog-side-margin: 30%;
 }
 
 /*****************************
@@ -140,13 +196,6 @@ article{
   margin: 0% var(--side-margin) 0 var(--side-margin);
   padding: 0;
   overflow: hidden;
-}
-
-iframe{
-  overflow: hidden;
-  border: none;
-  width: 100%;
-  height: 100%;
 }
 
 /*****************************
