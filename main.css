@@ -1,0 +1,205 @@
+@font-face {
+    font-family: 'VCR';
+    src: url('fonts/vcr-font-webfont.eot');
+    src: url('fonts/vcr-font-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/vcr-font-webfont.woff2') format('woff2'),
+         url('fonts/vcr-font-webfont.woff') format('woff'),
+         url('fonts/vcr-font-webfont.svg#vcr_osd_monoregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'apple';
+    src: url('fonts/SF-Pro-Display-Regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body{
+	font-size: 16px;
+	font-family: apple;
+}
+
+h1{	
+	margin-top: 5%;
+	text-align: center;		
+}
+
+h2{
+	font-size: 1.75em;
+}
+
+#bio-img{
+	width: 96px;
+	height: 96px;
+}
+
+#resume-link{
+	margin-top: 2.5%;
+	text-align: center;
+	font-family: VCR,Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1.1em;
+	color: #ababab;	
+}
+
+#resume-link:hover{
+	text-decoration: none;
+	color: #4f92ff;
+}
+
+.section-img{
+	width: 64px;
+	height: 64px;
+}
+
+.section-container{
+	padding: 5% 25%;
+}
+
+.grey{
+	background-color: #ededed;
+}
+
+.section-header{
+	margin: 5% 0;
+}
+
+#bio{
+	font-size: 0.95em;
+	margin-top: 5%;
+}
+
+#skills{
+	font-size: 0.95em;	
+}
+.skill-header{
+	font-family: VCR,Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1em;
+	color: #ababab;	
+}
+
+#experience a{
+	font-family: VCR,Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1em;
+	color: #ababab;
+	cursor: pointer;	
+}
+
+#experience a:hover{
+	text-decoration: none;
+	color: #4f92ff;	
+}
+
+.dates{
+	text-align: right;	
+	font-family: VCR,Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1em;
+	color: #ababab;	
+}
+
+.institution{	
+	font-family: VCR,Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1em;
+	color: #ababab;	
+}
+
+.project-img{
+	width: 100%;
+	height: 50%;
+	cursor: pointer;
+}
+
+.project-description{
+	font-size: 0.95em;
+	margin-top: 15%;
+}
+
+#coursework{
+	color: #4f92ff;
+}
+
+.institution{
+	margin-bottom: 2.5%;
+}
+
+.education-description{
+	font-size: 0.95em;
+}
+
+footer{
+	text-align: center;
+}
+
+#footer-container{
+	padding: 2.5% 25%;	
+}
+
+#signature{
+	font-family: VCR,Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+	font-weight: normal;
+	font-style: normal;
+	font-size: 0.75em;
+	color: #ababab;
+	margin-bottom: 2.5%;	
+}
+
+.footer-img{
+	width: 35px;	
+	margin: 0 5px;	
+}
+
+@media screen and (max-width: 575.98px) {
+	body{
+		font-size: 12px;			
+	}
+	.section-container{
+		padding: 5% 15%;
+	}	
+	h1{
+		font-size: 2em;
+	}
+	#bio-img{
+		width: 55px;
+		height: 55px;
+	}
+	.section-img{
+		width: 45px;
+		height: 45px;
+	}
+	#machining{
+		text-align: center;
+	}
+	.project-img{
+		width: 75px;
+		height: 60px;
+	}
+	.project-description{
+		margin: 10px 0;
+	}
+	.footer-img{
+		width: 22px;		
+		margin: 0 2.5px;	
+	}
+	.edu-dates{
+		display: none;
+	}
+	.exp-dates{
+		display: none;
+	}
+}
+
+@media (max-width: 767.98px) {	
+}
+
+@media (max-width: 991.98px) { 
+}
