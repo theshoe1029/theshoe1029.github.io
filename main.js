@@ -21,55 +21,8 @@ if (gl === null) {
 }
 
 function main() {
-  const vsSource = `
-    attribute vec4 aVertexPosition;
-    attribute vec2 aTextureCoord;
-
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-
-    varying highp vec2 vTextureCoord;
-
-    void main(void) {
-      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      vTextureCoord = aTextureCoord;
-    }
-  `;
-
-  const fsSource = `
-    varying highp vec2 vTextureCoord;
-
-    uniform sampler2D uSampler;
-
-    void main(void) {
-      gl_FragColor = texture2D(uSampler, vTextureCoord);
-    }
-  `;
-
-  const shaderProgram = initShaderProgram(vsSource, fsSource);
-
-  const programInfo = {
-    program: shaderProgram,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
-      vertexNormal: gl.getAttribLocation(shaderProgram, "aVertexNormal"),
-      textureCoord: gl.getAttribLocation(shaderProgram, "aTextureCoord"),
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(
-        shaderProgram,
-        "uProjectionMatrix"
-      ),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
-      normalMatrix: gl.getUniformLocation(shaderProgram, "uNormalMatrix"),
-      uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
-    },
-  };
-
-  const buffers = initBuffers();
-
-  const texture = loadTexture("card.png");
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  let card = initCard();
+  let rect = initRect();
 
   document.addEventListener("mousemove", function (event) {
     mouseX = event.clientX;
@@ -77,7 +30,7 @@ function main() {
   });
 
   function render() {
-    drawScene(programInfo, buffers, texture, canvas);
+    drawScene(card, rect);
 
     requestAnimationFrame(render);
   }
@@ -172,11 +125,36 @@ function loadTexture(url) {
   return texture;
 }
 
-function initBuffers() {
+function initCard() {
+  const vsSource = `
+    attribute vec4 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying highp vec2 vTextureCoord;
+
+    void main(void) {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      vTextureCoord = aTextureCoord;
+    }
+  `;
+
+  const fsSource = `
+    varying highp vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+
+    void main(void) {
+      gl_FragColor = texture2D(uSampler, vTextureCoord);
+    }
+  `;
+
+  const program = initShaderProgram(vsSource, fsSource);
+
   const positionBuffer = gl.createBuffer();
-
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
   const positions = [
     // Front face
     -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
@@ -196,12 +174,10 @@ function initBuffers() {
     // Left face
     -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
   ];
-
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
   const indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-
   // prettier-ignore
   const indices = [
      0,  1,  2,      0,  2,  3,    // front
@@ -211,7 +187,6 @@ function initBuffers() {
      16, 17, 18,     16, 18, 19,   // right
      20, 21, 22,     20, 22, 23,   // left
   ];
-
   gl.bufferData(
     gl.ELEMENT_ARRAY_BUFFER,
     new Uint16Array(indices),
@@ -220,7 +195,6 @@ function initBuffers() {
 
   const textureBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
-
   const textureCoordinates = [
     // Front
     0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
@@ -235,21 +209,95 @@ function initBuffers() {
     // Left
     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
   ];
-
   gl.bufferData(
     gl.ARRAY_BUFFER,
     new Float32Array(textureCoordinates),
     gl.STATIC_DRAW
   );
 
-  return {
+  const buffers = {
     position: positionBuffer,
     indices: indexBuffer,
     textureCoord: textureBuffer,
   };
+
+  const texture = loadTexture("card.png");
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+  return {
+    program,
+    buffers,
+    texture,
+  };
 }
 
-function drawScene(programInfo, buffers, texture, canvas) {
+function initRect() {
+  const vsSource = `
+    attribute vec4 aVertexPosition;
+    attribute vec4 aVertexColor;
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying lowp vec4 vColor;
+
+    void main(void) {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      vColor = aVertexColor;
+    }
+  `;
+
+  const fsSource = `
+    varying lowp vec4 vColor;
+
+    void main(void) {
+      gl_FragColor = vColor;
+    }
+  `;
+
+  const program = initShaderProgram(vsSource, fsSource);
+
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+  const colorBuffer = gl.createBuffer();
+  const opacity = 0.35;
+  const colors = [
+    0.0,
+    0.0,
+    1.0,
+    opacity,
+    0.0,
+    0.0,
+    1.0,
+    opacity,
+    0.0,
+    0.0,
+    1.0,
+    opacity,
+    0.0,
+    0.0,
+    1.0,
+    opacity,
+  ];
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+  const buffers = {
+    position: positionBuffer,
+    color: colorBuffer,
+  };
+
+  return {
+    program,
+    buffers,
+  };
+}
+
+function drawScene(card, rect) {
+  gl.viewport(0, 0, canvas.width, canvas.height);
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
   gl.clearDepth(1.0); // Clear everything
   gl.enable(gl.DEPTH_TEST); // Enable depth testing
@@ -268,80 +316,91 @@ function drawScene(programInfo, buffers, texture, canvas) {
 
   mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -10.0]);
 
-  // 30, 30
-  // 350, 30
   if (mouseX < canvas.width && mouseY < canvas.height) {
-    yRotation = (2 * (mouseX - canvas.width / 2)) / canvas.width;
-    xRotation = (mouseY - canvas.height / 2) / canvas.height;
+    // yRotation = (2 * (mouseX - canvas.width / 2)) / canvas.width;
+    // xRotation = (mouseY - canvas.height / 2) / canvas.height;
+    const ndcX = (mouseX / canvas.width) * 2 - 1;
+    const ndcY = (mouseY / canvas.height) * 2 - 1;
   }
   mat4.rotate(modelViewMatrix, modelViewMatrix, xRotation, [1, 0, 0]);
   mat4.rotate(modelViewMatrix, modelViewMatrix, yRotation, [0, 1, 0]);
-  mat4.scale(modelViewMatrix, modelViewMatrix, [1.75, 1.0, 0.015]);
 
   const cardWidth = 448;
   const cardHeight = 256;
 
-  const cardHitbox = mat4.create();
-  mat4.scale(cardHitbox, cardHitbox, [cardWidth, cardHeight, 1]);
-  mat4.rotate(cardHitbox, cardHitbox, xRotation, [1, 0, 0]);
-  mat4.rotate(cardHitbox, cardHitbox, yRotation, [0, 1, 0]);
+  // const cardHitbox = mat4.create();
+  // mat4.scale(cardHitbox, cardHitbox, [cardWidth, cardHeight, 1]);
+  // mat4.rotate(cardHitbox, cardHitbox, xRotation, [1, 0, 0]);
+  // mat4.rotate(cardHitbox, cardHitbox, yRotation, [0, 1, 0]);
 
-  const xBound = cardWidth / 2;
-  const yBound = cardHeight / 2;
-  const centerX = gl.canvas.clientWidth / 2;
-  const centerY = gl.canvas.clientHeight / 2;
-  if (
-    Math.abs(mouseX - centerX) < xBound &&
-    Math.abs(mouseY - centerY) < yBound
-  ) {
-    console.log("hit");
-  }
+  // const xBound = cardWidth / 2;
+  // const yBound = cardHeight / 2;
+  // const centerX = gl.canvas.clientWidth / 2;
+  // const centerY = gl.canvas.clientHeight / 2;
+  // if (
+  //   Math.abs(mouseX - centerX) < xBound &&
+  //   Math.abs(mouseY - centerY) < yBound
+  // ) {
+  //   console.log("hit");
+  // }
 
-  const normalMatrix = mat4.create();
-  mat4.invert(normalMatrix, modelViewMatrix);
-  mat4.transpose(normalMatrix, normalMatrix);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-  gl.vertexAttribPointer(
-    programInfo.attribLocations.vertexPosition,
-    3,
-    gl.FLOAT,
-    false, // normalize
-    0, // stride
-    0 // offset
-  );
-  gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
-  gl.vertexAttribPointer(
-    programInfo.attribLocations.textureCoord,
-    2,
-    gl.FLOAT,
-    false, // normalize
-    0, // stride
-    0 // offset
-  );
-  gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
-
-  gl.useProgram(programInfo.program);
-
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.projectionMatrix,
-    false,
-    projectionMatrix
-  );
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.modelViewMatrix,
-    false,
-    modelViewMatrix
-  );
-
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+  const scaleFactor = 0.25;
+  const wCard = 1.75 * (1 + scaleFactor);
+  const hCard = 1.0 * (1 + scaleFactor);
 
   {
+    const cardMatrix = mat4.create();
+    mat4.scale(cardMatrix, modelViewMatrix, [wCard, hCard, 0.015]);
+
+    let program = card.program;
+    let buffers = card.buffers;
+    let texture = card.texture;
+
+    const vertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+    const textureCoord = gl.getAttribLocation(program, "aTextureCoord");
+
+    const uProjectionMatrix = gl.getUniformLocation(
+      program,
+      "uProjectionMatrix"
+    );
+    const uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
+    const uSampler = gl.getUniformLocation(program, "uSampler");
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+    gl.vertexAttribPointer(
+      vertexPosition,
+      3,
+      gl.FLOAT,
+      false, // normalize
+      0, // stride
+      0 // offset
+    );
+    gl.enableVertexAttribArray(vertexPosition);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
+    gl.vertexAttribPointer(
+      textureCoord,
+      2,
+      gl.FLOAT,
+      false, // normalize
+      0, // stride
+      0 // offset
+    );
+    gl.enableVertexAttribArray(textureCoord);
+
+    gl.useProgram(program);
+
+    gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    gl.uniformMatrix4fv(uModelViewMatrix, false, cardMatrix);
+
+    const test = mat4.create();
+    mat4.multiply(test, projectionMatrix, cardMatrix);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1i(uSampler, 0);
+
     const offset = 0;
     const vertexCount = 4;
     gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
@@ -352,32 +411,120 @@ function drawScene(programInfo, buffers, texture, canvas) {
       gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
     }
   }
-}
 
-function drawLines() {
-  var vertices = [0.5, 0.5, 0.0, 0.5, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0];
-  var vertexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  var vertCode = `
-      attribute vec3 coordinates;
-      void main(void) {
-        gl_Position = vec4(coordinates, 1.0);
-      }
-    `;
-  var fragCode = `
-      void main(void) {
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-      }
-    `;
-  let sp = initShaderProgram(gl, vertCode, fragCode);
+  {
+    const rectMatrix = mat4.create();
+    const h = 0.15;
+    const w = 2.5 * h;
+    const x = 42 / cardWidth + w / 2;
+    const y = 42 / cardHeight + h / 2;
+    mat4.translate(rectMatrix, modelViewMatrix, [
+      -wCard + w + x,
+      hCard - h - y,
+      0.05,
+    ]);
+    mat4.scale(rectMatrix, rectMatrix, [w, h, 1.0]);
 
-  gl.linkProgram(sp);
-  gl.useProgram(sp);
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  var coord = gl.getAttribLocation(sp, "coordinates");
-  gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(coord);
-  gl.drawArrays(gl.LINES, 0, 4);
+    const program = rect.program;
+    const buffers = rect.buffers;
+
+    const vertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+    const vertexColor = gl.getAttribLocation(program, "aVertexColor");
+
+    const uProjectionMatrix = gl.getUniformLocation(
+      program,
+      "uProjectionMatrix"
+    );
+    const uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+    gl.vertexAttribPointer(
+      vertexPosition,
+      2,
+      gl.FLOAT,
+      false, // normalize
+      0, // stride
+      0 // offset
+    );
+    gl.enableVertexAttribArray(vertexPosition);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+    gl.vertexAttribPointer(
+      vertexColor,
+      4,
+      gl.FLOAT,
+      false, // normalize
+      0, // stride
+      0 // offset
+    );
+    gl.enableVertexAttribArray(vertexColor);
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    gl.useProgram(program);
+
+    gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    gl.uniformMatrix4fv(uModelViewMatrix, false, rectMatrix);
+
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  {
+    const rectMatrix = mat4.create();
+    const h = 0.15;
+    const w = 2.5 * h;
+    const x = 10 / cardWidth + w / 2;
+    const y = 42 / cardHeight + h / 2;
+    mat4.translate(rectMatrix, modelViewMatrix, [
+      wCard - w - x,
+      hCard - h - y,
+      0.05,
+    ]);
+    mat4.scale(rectMatrix, rectMatrix, [w, h, 1.0]);
+
+    const program = rect.program;
+    const buffers = rect.buffers;
+
+    const vertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+    const vertexColor = gl.getAttribLocation(program, "aVertexColor");
+
+    const uProjectionMatrix = gl.getUniformLocation(
+      program,
+      "uProjectionMatrix"
+    );
+    const uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+    gl.vertexAttribPointer(
+      vertexPosition,
+      2,
+      gl.FLOAT,
+      false, // normalize
+      0, // stride
+      0 // offset
+    );
+    gl.enableVertexAttribArray(vertexPosition);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+    gl.vertexAttribPointer(
+      vertexColor,
+      4,
+      gl.FLOAT,
+      false, // normalize
+      0, // stride
+      0 // offset
+    );
+    gl.enableVertexAttribArray(vertexColor);
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
+    gl.useProgram(program);
+
+    gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    gl.uniformMatrix4fv(uModelViewMatrix, false, rectMatrix);
+
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
 }
