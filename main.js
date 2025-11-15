@@ -305,8 +305,12 @@ function drawScene(card, rect) {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  const ndcX = (mouseX / canvas.width) * 2 - 1;
+  const ndcY = (mouseY / canvas.height) * 2 - 1;
+  const mouse = vec4.fromValues(ndcX, ndcY, 0, 0);
+
   const fieldOfView = (45 * Math.PI) / 180; // in radians
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  const aspect = canvas.width / canvas.height;
   const zNear = 0.1;
   const zFar = 100.0;
   const projectionMatrix = mat4.create();
@@ -319,8 +323,6 @@ function drawScene(card, rect) {
   if (mouseX < canvas.width && mouseY < canvas.height) {
     // yRotation = (2 * (mouseX - canvas.width / 2)) / canvas.width;
     // xRotation = (mouseY - canvas.height / 2) / canvas.height;
-    const ndcX = (mouseX / canvas.width) * 2 - 1;
-    const ndcY = (mouseY / canvas.height) * 2 - 1;
   }
   mat4.rotate(modelViewMatrix, modelViewMatrix, xRotation, [1, 0, 0]);
   mat4.rotate(modelViewMatrix, modelViewMatrix, yRotation, [0, 1, 0]);
@@ -394,9 +396,6 @@ function drawScene(card, rect) {
     gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
     gl.uniformMatrix4fv(uModelViewMatrix, false, cardMatrix);
 
-    const test = mat4.create();
-    mat4.multiply(test, projectionMatrix, cardMatrix);
-
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.uniform1i(uSampler, 0);
@@ -424,6 +423,25 @@ function drawScene(card, rect) {
       0.05,
     ]);
     mat4.scale(rectMatrix, rectMatrix, [w, h, 1.0]);
+    const points = [
+      vec4.fromValues(1.0, 1.0, 0.0, 0.0),
+      vec4.fromValues(-1.0, 1.0, 0.0, 0.0),
+      vec4.fromValues(1.0, -1.0, 0.0, 0.0),
+      vec4.fromValues(-1.0, -1.0, 0.0, 0.0),
+    ].map((point) => {
+      const m = mat4.create();
+      mat4.multiply(m, projectionMatrix, rectMatrix);
+      const translated = vec3.create();
+      mat4.multiply(translated, m, point);
+      return vec3.fromValues(
+        (translated[0] / aspect) * 2.0 - 1.0,
+        (translated[1] / aspect) * 2.0 - 1.0,
+        translated[2]
+      );
+    });
+
+    mat4.multiply(mouse, rectMatrix, mouse);
+    const shouldDraw = inPlane(mouse, points);
 
     const program = rect.program;
     const buffers = rect.buffers;
@@ -467,7 +485,9 @@ function drawScene(card, rect) {
     gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
     gl.uniformMatrix4fv(uModelViewMatrix, false, rectMatrix);
 
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if (shouldDraw) {
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
   }
 
   {
@@ -527,4 +547,38 @@ function drawScene(card, rect) {
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
+}
+
+function inPlane(mouse, plane) {
+  const p = plane[0];
+  const q = plane[1];
+  const r = plane[2];
+
+  const N = getNormal(p, q, r);
+
+  for (let i = 0; i < plane.length; i++) {
+    const n = vec3.create();
+    const point = vec3.create();
+    vec3.subtract(point, plane[(i + 1) % plane.length], plane[i]);
+    vec3.cross(n, point, N);
+
+    const test = vec3.dot(n, mouse);
+    if (test < 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function getNormal(p, q, r) {
+  const pq = vec3.create();
+  vec3.subtract(pq, p, q);
+  const qr = vec3.create();
+  vec3.subtract(qr, q, r);
+
+  const norm = vec3.create();
+  vec3.cross(norm, pq, qr);
+  vec3.normalize(norm, norm);
+
+  return norm;
 }
