@@ -26,13 +26,15 @@ if (gl === null) {
 
 function main() {
   const textureShader = getTextureShader();
+  const cardWidth = 448;
+  const cardHeight = 256;
   const card = initTextured(textureShader, {
     pos: {
-      x: 0,
-      y: 500,
-      z: 0,
-      w: 100,
-      h: 100,
+      x: (canvas.width - cardWidth) / 2,
+      y: (canvas.height + cardHeight) / 2,
+      z: -10,
+      w: cardWidth,
+      h: cardHeight,
       d: 0.15,
     },
     textureName: "card.png",
@@ -59,7 +61,7 @@ function main() {
   });
 
   const scene = {
-    textured: [card],
+    textured: { objs: [card], program: textureShader },
     rect: { objs: [], program: colorShader },
   };
 
@@ -81,10 +83,6 @@ function drawScene(scene) {
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  const ndcX = (mouseX / canvas.width) * 2 - 1;
-  const ndcY = (mouseY / canvas.height) * 2 - 1;
-  const mouse = vec4.fromValues(ndcX, ndcY, 0, 0);
-
   const fieldOfView = (45 * Math.PI) / 180; // in radians
   const aspect = canvas.width / canvas.height;
   const zNear = 0.1;
@@ -94,7 +92,7 @@ function drawScene(scene) {
 
   const modelViewMatrix = mat4.create();
 
-  //mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -10.0]);
+  //mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -1.0]);
 
   if (mouseX < canvas.width && mouseY < canvas.height) {
     // yRotation = (2 * (mouseX - canvas.width / 2)) / canvas.width;
@@ -103,8 +101,13 @@ function drawScene(scene) {
   mat4.rotate(modelViewMatrix, modelViewMatrix, xRotation, [1, 0, 0]);
   mat4.rotate(modelViewMatrix, modelViewMatrix, yRotation, [0, 1, 0]);
 
-  const cardWidth = 448;
-  const cardHeight = 256;
+  const textured = scene.textured;
+
+  gl.useProgram(textured.program);
+
+  for (let obj of textured.objs) {
+    obj.draw(projectionMatrix, modelViewMatrix);
+  }
 
   const rect = scene.rect;
 
@@ -160,7 +163,7 @@ function drawScene(scene) {
 function convertPos(pos) {
   return {
     x: convertX(pos.x),
-    y: convertY(pos.y),
+    y: -1 * convertY(pos.y),
     w: convertWidth(pos.w),
     h: convertHeight(pos.h),
   };
@@ -185,6 +188,21 @@ function convertHeight(h) {
 function enableAttribute(program, buffer, stride, attrib) {
   const aLocation = gl.getAttribLocation(program, attrib);
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.vertexAttribPointer(
+    aLocation,
+    stride,
+    gl.FLOAT,
+    false, // normalize
+    0, // stride
+    0 // offset
+  );
+  gl.enableVertexAttribArray(aLocation);
+}
+
+function enableIndexedAttribute(program, buffer, indexBuffer, stride, attrib) {
+  const aLocation = gl.getAttribLocation(program, attrib);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.vertexAttribPointer(
     aLocation,
     stride,
@@ -225,143 +243,6 @@ function getTextureShader() {
   return initShaderProgram(vsSource, fsSource);
 }
 
-function getTexturedBuffers() {
-  const positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  const positions = [
-    // Front face
-    -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
-
-    // Back face
-    -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
-
-    // Top face
-    -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
-
-    // Bottom face
-    -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
-
-    // Right face
-    1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
-
-    // Left face
-    -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
-  ];
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-  const indexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  // prettier-ignore
-  const indices = [
-     0,  1,  2,      0,  2,  3,    // front
-     4,  5,  6,      4,  6,  7,    // back
-     8,  9,  10,     8,  10, 11,   // top
-     12, 13, 14,     12, 14, 15,   // bottom
-     16, 17, 18,     16, 18, 19,   // right
-     20, 21, 22,     20, 22, 23,   // left
-  ];
-  gl.bufferData(
-    gl.ELEMENT_ARRAY_BUFFER,
-    new Uint16Array(indices),
-    gl.STATIC_DRAW
-  );
-
-  const textureBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
-  const textureCoordinates = [
-    // Front
-    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-    // Back
-    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
-    // Top
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    // Bottom
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    // Right
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    // Left
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  ];
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array(textureCoordinates),
-    gl.STATIC_DRAW
-  );
-
-  return {
-    position: positionBuffer,
-    indices: indexBuffer,
-    textureCoord: textureBuffer,
-  };
-}
-
-function getTexturedObj() {
-  const texture = loadTexture("card.png");
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
-  return {
-    program,
-    buffers,
-    texture,
-  };
-}
-
-// const scaleFactor = 0.25;
-// const wCard = 1.75 * (1 + scaleFactor);
-// const hCard = 1.0 * (1 + scaleFactor);
-function initTextured() {}
-
-function drawTextured() {
-  const vertexPosition = gl.getAttribLocation(program, "aVertexPosition");
-  const textureCoord = gl.getAttribLocation(program, "aTextureCoord");
-
-  const uProjectionMatrix = gl.getUniformLocation(program, "uProjectionMatrix");
-  const uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
-  const uSampler = gl.getUniformLocation(program, "uSampler");
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-  gl.vertexAttribPointer(
-    vertexPosition,
-    3,
-    gl.FLOAT,
-    false, // normalize
-    0, // stride
-    0 // offset
-  );
-  gl.enableVertexAttribArray(vertexPosition);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
-  gl.vertexAttribPointer(
-    textureCoord,
-    2,
-    gl.FLOAT,
-    false, // normalize
-    0, // stride
-    0 // offset
-  );
-  gl.enableVertexAttribArray(textureCoord);
-
-  gl.useProgram(program);
-
-  gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
-  gl.uniformMatrix4fv(uModelViewMatrix, false, cardMatrix);
-
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.uniform1i(uSampler, 0);
-
-  const offset = 0;
-  const vertexCount = 4;
-  gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
-  {
-    const vertexCount = 36;
-    const type = gl.UNSIGNED_SHORT;
-    const offset = 0;
-    gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
-  }
-}
-
 function getColorShader() {
   const vsSource = `
     attribute vec4 aVertexPosition;
@@ -389,27 +270,163 @@ function getColorShader() {
   return initShaderProgram(vsSource, fsSource);
 }
 
+// const scaleFactor = 0.25;
+// const wCard = 1.75 * (1 + scaleFactor);
+// const hCard = 1.0 * (1 + scaleFactor);
+function initTextured(program, obj) {
+  const pos = convertPos(obj.pos);
+  // prettier-ignore
+  const positions = [
+    // --- Front (+Z) ---
+    pos.x+pos.w,  pos.y,        1.0,   // bottom-left  (flipped)
+    pos.x,        pos.y,        1.0,   // bottom-right
+    pos.x,        pos.y+pos.h,  1.0,   // top-right
+    pos.x+pos.w,  pos.y+pos.h,  1.0,   // top-left
+
+    // --- Back (-Z) ---
+    pos.x,        pos.y,       -1.0,   // bottom-left  (flipped)
+    pos.x+pos.w,  pos.y,       -1.0,   // bottom-right
+    pos.x+pos.w,  pos.y+pos.h, -1.0,   // top-right
+    pos.x,        pos.y+pos.h, -1.0,   // top-left
+
+    // --- Top ---
+    pos.x+pos.w,  pos.y+pos.h, -1.0,   // bottom-left  (flipped)
+    pos.x,        pos.y+pos.h, -1.0,   // bottom-right
+    pos.x,        pos.y+pos.h,  1.0,   // top-right
+    pos.x+pos.w,  pos.y+pos.h,  1.0,   // top-left
+
+    // --- Bottom ---
+    pos.x+pos.w,  pos.y,       -1.0,   // bottom-left  (flipped)
+    pos.x,        pos.y,       -1.0,   // bottom-right
+    pos.x,        pos.y,        1.0,   // top-right
+    pos.x+pos.w,  pos.y,        1.0,   // top-left
+
+    // --- Right (+X side) becomes mirrored left ---
+    pos.x,        pos.y,       -1.0,   // bottom-left  (used to be right side)
+    pos.x,        pos.y+pos.h, -1.0,
+    pos.x,        pos.y+pos.h,  1.0,
+    pos.x,        pos.y,        1.0,
+
+    // --- Left (-X side) becomes mirrored right ---
+    pos.x+pos.w,  pos.y,       -1.0,   // bottom-left
+    pos.x+pos.w,  pos.y+pos.h, -1.0,
+    pos.x+pos.w,  pos.y+pos.h,  1.0,
+    pos.x+pos.w,  pos.y,        1.0,
+  ];
+
+  const positionBuffer = bindFloats(positions);
+
+  // prettier-ignore
+  const indices = [
+     0,  1,  2,      0,  2,  3,    // front
+     4,  5,  6,      4,  6,  7,    // back
+     8,  9,  10,     8,  10, 11,   // top
+     12, 13, 14,     12, 14, 15,   // bottom
+     16, 17, 18,     16, 18, 19,   // right
+     20, 21, 22,     20, 22, 23,   // left
+  ];
+  const indexBuffer = bindInts(indices);
+
+  const textureCoordinates = [
+    // Front
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+    // Back
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+    // Top
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    // Bottom
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    // Right
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    // Left
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  ];
+  const textureBuffer = bindFloats(textureCoordinates);
+
+  const texture = loadTexture("card.png", pos.w, pos.h);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+  const draw = (projectionMatrix, modelViewMatrix) => {
+    drawTextured(
+      positionBuffer,
+      indexBuffer,
+      textureBuffer,
+      texture,
+      program,
+      projectionMatrix,
+      modelViewMatrix
+    );
+  };
+
+  return { draw };
+}
+
+function drawTextured(
+  positionBuffer,
+  indexBuffer,
+  textureBuffer,
+  texture,
+  program,
+  projectionMatrix,
+  modelViewMatrix
+) {
+  enableIndexedAttribute(
+    program,
+    positionBuffer,
+    indexBuffer,
+    3,
+    "aVertexPosition"
+  );
+  enableAttribute(program, textureBuffer, 2, "aTextureCoord");
+
+  const uProjectionMatrix = gl.getUniformLocation(program, "uProjectionMatrix");
+  const uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
+
+  gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+  gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  const uSampler = gl.getUniformLocation(program, "uSampler");
+  gl.uniform1i(uSampler, 0);
+
+  const offset = 0;
+  const vertexCount = 4;
+  gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
+  {
+    const vertexCount = 36;
+    const type = gl.UNSIGNED_SHORT;
+    const offset = 0;
+    gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+  }
+}
+
 function getRectPositions(screenPos) {
   const pos = convertPos(screenPos);
-  const yNew = -1 * pos.y;
   return [
     pos.x,
-    yNew,
+    pos.y,
     pos.x,
-    yNew - pos.h,
+    pos.y - pos.h,
     pos.x + pos.w,
-    yNew,
+    pos.y,
     pos.x + pos.w,
-    yNew - pos.h,
+    pos.y - pos.h,
   ];
 }
 
-function bindRectPositions(screenPos) {
-  const positionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  const positions = getRectPositions(screenPos);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-  return positionBuffer;
+function bindFloats(data) {
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+  return buffer;
+}
+
+function bindInts(data) {
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), gl.STATIC_DRAW);
+  return buffer;
 }
 
 function bindSolidRectColor(color) {
@@ -421,7 +438,7 @@ function bindSolidRectColor(color) {
 }
 
 function initRect(program, rect) {
-  const positionBuffer = bindRectPositions(rect.pos);
+  const positionBuffer = bindFloats(getRectPositions(rect.pos));
   const colorBuffer = bindSolidRectColor(rect.color);
 
   const draw = (projectionMatrix, modelViewMatrix) => {
@@ -530,14 +547,12 @@ function loadShader(type, source) {
   return shader;
 }
 
-function loadTexture(url) {
+function loadTexture(url, width, height) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
   const level = 0;
   const internalFormat = gl.RGBA;
-  const width = 1.75;
-  const height = 1;
   const border = 0;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
