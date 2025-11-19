@@ -28,41 +28,45 @@ function main() {
   const textureShader = getTextureShader();
   const cardWidth = 448;
   const cardHeight = 256;
+  const cardX = (canvas.width - cardWidth) / 2;
+  const cardY = (canvas.height + cardHeight) / 2;
   const card = initTextured(textureShader, {
     pos: {
-      x: (canvas.width - cardWidth) / 2,
-      y: (canvas.height + cardHeight) / 2,
-      z: -10,
+      x: cardX,
+      y: cardY,
+      z: -0.01,
       w: cardWidth,
       h: cardHeight,
-      d: 0.15,
+      d: 0.0025,
     },
     textureName: "card.png",
   });
 
   const colorShader = getColorShader();
+  const linkW = 90;
+  const linkH = 30;
   const lLink = initRect(colorShader, {
     pos: {
-      x: 50,
-      y: 300,
-      w: 200,
-      h: 100,
+      x: cardX + 22,
+      y: cardY - cardHeight + 25,
+      w: linkW,
+      h: linkH,
     },
     color: [0, 0, 1.0, 0.35],
   });
   const rLink = initRect(colorShader, {
     pos: {
-      x: 500,
-      y: 300,
-      w: 200,
-      h: 100,
+      x: cardX + 343,
+      y: cardY - cardHeight + 25,
+      w: linkW,
+      h: linkH,
     },
     color: [0, 0, 1.0, 0.35],
   });
 
   const scene = {
     textured: { objs: [card], program: textureShader },
-    rect: { objs: [], program: colorShader },
+    rect: { objs: [lLink], program: colorShader },
   };
 
   const render = () => {
@@ -84,19 +88,18 @@ function drawScene(scene) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   const fieldOfView = (45 * Math.PI) / 180; // in radians
-  const aspect = canvas.width / canvas.height;
+  const aspect = 1;
   const zNear = 0.1;
-  const zFar = 100.0;
+  const zFar = 100;
   const projectionMatrix = mat4.create();
-  //mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+  mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
   const modelViewMatrix = mat4.create();
-
-  //mat4.translate(modelViewMatrix, modelViewMatrix, [-0.0, 0.0, -1.0]);
+  mat4.translate(modelViewMatrix, modelViewMatrix, [0.0, 0.0, -2]);
 
   if (mouseX < canvas.width && mouseY < canvas.height) {
-    // yRotation = (2 * (mouseX - canvas.width / 2)) / canvas.width;
-    // xRotation = (mouseY - canvas.height / 2) / canvas.height;
+    // yRotation = convertX(mouseX);
+    // xRotation = convertY(mouseY);
   }
   mat4.rotate(modelViewMatrix, modelViewMatrix, xRotation, [1, 0, 0]);
   mat4.rotate(modelViewMatrix, modelViewMatrix, yRotation, [0, 1, 0]);
@@ -121,51 +124,14 @@ function drawScene(scene) {
   }
 }
 
-// const h = 0.15;
-// const w = 2.5 * h;
-// const x = 42 / cardWidth + w / 2;
-// const y = 42 / cardHeight + h / 2;
-// mat4.translate(rectMatrix, modelViewMatrix, [
-//   -wCard + w + x,
-//   hCard - h - y,
-//   0.05,
-// ]);
-// mat4.scale(rectMatrix, rectMatrix, [w, h, 1.0]);
-// const points = [
-//   vec4.fromValues(1.0, 1.0, 0.0, 0.0),
-//   vec4.fromValues(-1.0, 1.0, 0.0, 0.0),
-//   vec4.fromValues(1.0, -1.0, 0.0, 0.0),
-//   vec4.fromValues(-1.0, -1.0, 0.0, 0.0),
-// ].map((point) => {
-//   const m = mat4.create();
-//   mat4.multiply(m, projectionMatrix, rectMatrix);
-//   const translated = vec3.create();
-//   mat4.multiply(translated, m, point);
-//   return vec3.fromValues(
-//     (translated[0] / aspect) * 2.0 - 1.0,
-//     (translated[1] / aspect) * 2.0 - 1.0,
-//     translated[2]
-//   );
-// });
-
-// const h = 0.15;
-// const w = 2.5 * h;
-// const x = 10 / cardWidth + w / 2;
-// const y = 42 / cardHeight + h / 2;
-// const rectMatrix = mat4.create();
-// mat4.translate(rectMatrix, modelViewMatrix, [
-//   wCard - w - x,
-//   hCard - h - y,
-//   0.05,
-// ]);
-// mat4.scale(rectMatrix, rectMatrix, [w, h, 1.0]);
-
 function convertPos(pos) {
   return {
     x: convertX(pos.x),
     y: -1 * convertY(pos.y),
+    z: pos.z,
     w: convertWidth(pos.w),
     h: convertHeight(pos.h),
+    d: pos.d,
   };
 }
 
@@ -270,48 +236,45 @@ function getColorShader() {
   return initShaderProgram(vsSource, fsSource);
 }
 
-// const scaleFactor = 0.25;
-// const wCard = 1.75 * (1 + scaleFactor);
-// const hCard = 1.0 * (1 + scaleFactor);
 function initTextured(program, obj) {
   const pos = convertPos(obj.pos);
   // prettier-ignore
   const positions = [
     // --- Front (+Z) ---
-    pos.x+pos.w,  pos.y,        1.0,   // bottom-left  (flipped)
-    pos.x,        pos.y,        1.0,   // bottom-right
-    pos.x,        pos.y+pos.h,  1.0,   // top-right
-    pos.x+pos.w,  pos.y+pos.h,  1.0,   // top-left
+    pos.x,         pos.y,         pos.z + pos.d / 2,   // bottom-left
+    pos.x + pos.w, pos.y,         pos.z + pos.d / 2,   // bottom-right
+    pos.x + pos.w, pos.y + pos.h, pos.z + pos.d / 2,   // top-right
+    pos.x,         pos.y + pos.h, pos.z + pos.d / 2,   // top-left
 
     // --- Back (-Z) ---
-    pos.x,        pos.y,       -1.0,   // bottom-left  (flipped)
-    pos.x+pos.w,  pos.y,       -1.0,   // bottom-right
-    pos.x+pos.w,  pos.y+pos.h, -1.0,   // top-right
-    pos.x,        pos.y+pos.h, -1.0,   // top-left
+    pos.x + pos.w, pos.y,         pos.z - pos.d / 2,   // bottom-left
+    pos.x,         pos.y,         pos.z - pos.d / 2,   // bottom-right
+    pos.x,         pos.y + pos.h, pos.z - pos.d / 2,   // top-right
+    pos.x + pos.w, pos.y + pos.h, pos.z - pos.d / 2,   // top-left
 
     // --- Top ---
-    pos.x+pos.w,  pos.y+pos.h, -1.0,   // bottom-left  (flipped)
-    pos.x,        pos.y+pos.h, -1.0,   // bottom-right
-    pos.x,        pos.y+pos.h,  1.0,   // top-right
-    pos.x+pos.w,  pos.y+pos.h,  1.0,   // top-left
+    pos.x,         pos.y + pos.h, pos.z - pos.d / 2,
+    pos.x + pos.w, pos.y + pos.h, pos.z - pos.d / 2,
+    pos.x + pos.w, pos.y + pos.h, pos.z + pos.d / 2,
+    pos.x,         pos.y + pos.h, pos.z + pos.d / 2,
 
     // --- Bottom ---
-    pos.x+pos.w,  pos.y,       -1.0,   // bottom-left  (flipped)
-    pos.x,        pos.y,       -1.0,   // bottom-right
-    pos.x,        pos.y,        1.0,   // top-right
-    pos.x+pos.w,  pos.y,        1.0,   // top-left
+    pos.x,         pos.y,         pos.z - pos.d / 2,
+    pos.x + pos.w, pos.y,         pos.z - pos.d / 2,
+    pos.x + pos.w, pos.y,         pos.z + pos.d / 2,
+    pos.x,         pos.y,         pos.z + pos.d / 2,
 
-    // --- Right (+X side) becomes mirrored left ---
-    pos.x,        pos.y,       -1.0,   // bottom-left  (used to be right side)
-    pos.x,        pos.y+pos.h, -1.0,
-    pos.x,        pos.y+pos.h,  1.0,
-    pos.x,        pos.y,        1.0,
+    // --- Right (+X side) ---
+    pos.x + pos.w, pos.y,         pos.z - pos.d / 2,
+    pos.x + pos.w, pos.y + pos.h, pos.z - pos.d / 2,
+    pos.x + pos.w, pos.y + pos.h, pos.z + pos.d / 2,
+    pos.x + pos.w, pos.y,         pos.z + pos.d / 2,
 
-    // --- Left (-X side) becomes mirrored right ---
-    pos.x+pos.w,  pos.y,       -1.0,   // bottom-left
-    pos.x+pos.w,  pos.y+pos.h, -1.0,
-    pos.x+pos.w,  pos.y+pos.h,  1.0,
-    pos.x+pos.w,  pos.y,        1.0,
+    // --- Left (-X side) ---
+    pos.x,         pos.y,         pos.z - pos.d / 2,
+    pos.x,         pos.y + pos.h, pos.z - pos.d / 2,
+    pos.x,         pos.y + pos.h, pos.z + pos.d / 2,
+    pos.x,         pos.y,         pos.z + pos.d / 2,
   ];
 
   const positionBuffer = bindFloats(positions);
@@ -415,6 +378,19 @@ function getRectPositions(screenPos) {
   ];
 }
 
+function getPlane(pos) {
+  return [
+    pos.x,
+    pos.y,
+    pos.x,
+    pos.y - pos.h,
+    pos.x + pos.w,
+    pos.y,
+    pos.x + pos.w,
+    pos.y - pos.h,
+  ];
+}
+
 function bindFloats(data) {
   const buffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -472,17 +448,63 @@ function drawRect(
   gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
   gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
 
-  const plane = getRectPositions(rect.pos);
-  if (pnpoly(plane, convertX(mouseX), -1 * convertY(mouseY))) {
+  console.log(
+    "start",
+    unProject(mouseX, mouseY, 0, modelViewMatrix, projectionMatrix)
+  );
+  console.log(
+    "end",
+    unProject(mouseX, mouseY, 1, modelViewMatrix, projectionMatrix)
+  );
+  const plane = getPlane(rect.pos);
+  // const unproject = mat4.create();
+  // mat4.multiply(unproject, modelViewMatrix, projectionMatrix);
+  // mat4.invert(unproject, unproject);
+  // let plane2 = [];
+  // for (let i = 0; i < plane.length / 2; i++) {
+  //   const x = plane[2 * i];
+  //   const y = plane[2 * i + 1];
+  //   const point = vec4.fromValues(x, y, 0, 1.0);
+  //   // vec4.transformMat4(point, point, modelViewMatrix);
+  //   // vec4.transformMat4(point, point, projectionMatrix);
+  //   vec4.transformMat4(point, point, unproject);
+  //   plane2.push(point[0], point[1]);
+  // }
+  if (pnpoly(plane, mouseX, mouseY)) {
     document.body.style.cursor = "pointer";
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+function unProject(winX, winY, winZ, modelViewMatrix, projectionMatrix) {
+  const input = vec4.fromValues(winX, winY, winZ, 1);
+
+  const unproject = mat4.create();
+  mat4.multiply(unproject, modelViewMatrix, projectionMatrix);
+  mat4.invert(unproject, unproject);
+
+  input[0] = winX / canvas.width;
+  input[1] = winY / canvas.height;
+
+  input[0] = input[0] * 2 - 1;
+  input[1] = input[1] * 2 - 1;
+  input[2] = input[2] * 2 - 1;
+
+  const result = vec4.create();
+  mat4.multiply(result, unproject, input);
+
+  result[0] /= result[3];
+  result[1] /= result[3];
+  result[2] /= result[3];
+
+  return result;
 }
 
 // from https://wrfranklin.org/Research/Short_Notes/pnpoly.html#The%20Method
 function pnpoly(verts, testx, testy) {
   let c = false;
   const nvert = verts.length / 2;
+  //console.log(verts, testx, testy);
 
   for (let i = 0, j = nvert - 1; i < nvert; j = i++) {
     const xi = verts[2 * i];
