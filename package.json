@@ -1,0 +1,26 @@
+{
+  "name": "theshoe1029.github.io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theshoe1029/theshoe1029.github.io.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theshoe1029/theshoe1029.github.io/issues"
+  },
+  "homepage": "https://github.com/theshoe1029/theshoe1029.github.io#readme",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.2.2"
+  },
+  "dependencies": {
+    "three": "^0.181.2"
+  }
+}

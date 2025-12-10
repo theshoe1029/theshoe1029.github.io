@@ -1,34 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <title>Adam Schueller</title>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
-      integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
-      crossorigin="anonymous"
-      defer></script>
-    <script data-src="shader.vert" data-name="particles" type="x-shader/x-vertex"></script>
-    <script data-src="shaders/particles/fragment.js" data-name="particles" type="x-shader/x-fragment"></script>
-    <script src="main.js" type="module"></script>
+    <style>
+      body { margin: 0; }
+    </style>
   </head>
-
   <body>
-    <canvas id="gl-canvas"></canvas>
-    <div id="fallback" hidden>
-      <h1>Fallback</h1>
-    </div>
+    <script type="module" src="/main.js"></script>
   </body>
-
-  <style>
-    html, body {
-      margin: 0 !important;
-      padding: 0 !important;
-      overflow: hidden;
-    }
-
-    canvas {
-      display:block;
-    }
-  </style>
 </html>
